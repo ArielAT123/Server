@@ -13,23 +13,18 @@ async function register(req, res) {
         }
 
         // Crear nuevo usuario
-        const user = new User({
-            email: email.toLowerCase(),
-        });
+        const user = new User({ email: email.toLowerCase() });
 
-        // Generar el salt y hashear la contraseña
+        // Generar el hash de la contraseña
         const salt = bcryptjs.genSaltSync(10);
-        const hashPassword = bcryptjs.hashSync(password, salt);
-        user.password = hashPassword;
+        user.password = bcryptjs.hashSync(password, salt);
 
-        // Guardar el usuario utilizando async/await
+        // Guardar usuario en la base de datos
         const userStorage = await user.save();
-
-        // Responder con éxito
-        res.status(201).send(userStorage);
+        return res.status(201).send(userStorage);
     } catch (error) {
-        console.log(error);
-        res.status(400).send({ msg: "Error al registrar el usuario", error });
+        console.error("Error en register:", error);
+        return res.status(500).send({ msg: "Error al registrar el usuario", error });
     }
 }
 
@@ -38,36 +33,37 @@ async function login(req, res) {
         const { email, password } = req.body;
 
         const emailLowerCase = email.toLowerCase();
-
-        // Buscar usuario
         const userStorage = await User.findOne({ email: emailLowerCase });
 
         if (!userStorage) {
             return res.status(400).send({ msg: "Usuario no encontrado" });
         }
 
-        // Verificar la contraseña
-        const check = await bcryptjs.compare(password, userStorage.password);
+        try {
+            // Comparar contraseña usando bcryptjs
+            const check = await bcryptjs.compare(password, userStorage.password);
 
-        if (!check) {
-            return res.status(400).send({ msg: "Contraseña incorrecta" });
+            if (!check) {
+                return res.status(400).send({ msg: "Contraseña incorrecta" });
+            }
+
+            // Generar tokens
+            return res.status(200).send({
+                access: jwt.createAccessToken(userStorage),
+                refresh: jwt.createRefreshToken(userStorage),
+            });
+
+        } catch (bcryptError) {
+            console.error("Error en bcrypt.compare:", bcryptError);
+            return res.status(500).send({ msg: "Error al verificar la contraseña" });
         }
-
-        // Generar los tokens
-        const accessToken = jwt.createAccessToken(userStorage);
-        const refreshToken = jwt.createRefreshToken(userStorage);
-
-        res.status(200).send({
-            access: accessToken,
-            refresh: refreshToken,
-        });
     } catch (error) {
-        console.log(error);
-        res.status(500).send({ msg: "Error del servidor", error });
+        console.error("Error en login:", error);
+        return res.status(500).send({ msg: "Error del servidor", error });
     }
 }
 
-async function refreshaccessToken(req, res) {
+async function refreshAccessToken(req, res) {
     try {
         const { refreshToken } = req.body;
 
@@ -76,32 +72,29 @@ async function refreshaccessToken(req, res) {
         }
 
         const hasExpired = jwt.hasExpiredToken(refreshToken);
-
         if (hasExpired) {
             return res.status(400).send({ msg: "Token expirado" });
         }
 
         const { user_id } = jwt.decoded(refreshToken);
-
         const userStorage = await User.findById(user_id);
 
         if (!userStorage) {
             return res.status(404).send({ msg: "Usuario no encontrado" });
         }
 
-        const newAccessToken = jwt.createAccessToken(userStorage);
-
-        res.status(200).send({
-            accessToken: newAccessToken,
+        return res.status(200).send({
+            accessToken: jwt.createAccessToken(userStorage),
         });
+
     } catch (error) {
-        console.error("Error al refrescar el token:", error);
-        res.status(500).send({ msg: "Error del servidor" });
+        console.error("Error en refreshAccessToken:", error);
+        return res.status(500).send({ msg: "Error del servidor", error });
     }
 }
 
 export const AuthController = {
     register,
     login,
-    refreshaccessToken,
+    refreshAccessToken,
 };
