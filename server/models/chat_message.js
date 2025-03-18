@@ -1,24 +1,24 @@
 import mongoose from "mongoose";
 
-const ChatMessageSchema = new mongoose.Schema(
-    {
-        chat: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Chat",
-        },
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
-        message: String,
-        type: {
-            type: String,
-            enum: ["TEXT", "IMAGE"],
-        },
+const ChatMessageSchema = mongoose.Schema(
+  {
+    chat: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Chat",
     },
-    {
-        timestamps: true,
-    }
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    message: String,
+    type: {
+      type: String,
+      enum: ["TEXT", "IMAGE"],
+    },
+  },
+  {
+    timestamps: true,
+  }
 );
 
 export const ChatMessage = mongoose.model("ChatMessage", ChatMessageSchema);

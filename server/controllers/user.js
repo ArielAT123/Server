@@ -78,6 +78,8 @@ async function getUsersExeptParticipantsGroup(req, res) {
     try {
         const { group_id } = req.params;
 
+        console.log(req);
+
         const group = await Group.findById(group_id);
         if (!group) {
             return res.status(404).send({ msg: "Grupo no encontrado" });
