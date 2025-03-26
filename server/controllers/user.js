@@ -99,6 +99,42 @@ async function getUsersExeptParticipantsGroup(req, res) {
         return res.status(500).send({ msg: "Error del servidor", error });
     }
 }
+async function assignUsername(req, res) {
+    try {
+        const { user_id } = req.user; // Assuming the authenticated user's ID comes from req.user
+        const { username } = req.body;
+
+        // Validate username is provided
+        if (!username) {
+            return res.status(400).send({ msg: "El username es requerido" });
+        }
+
+        // Check if username is already taken
+        const existingUser = await User.findOne({ username });
+        if (existingUser && existingUser._id.toString() !== user_id) {
+            return res.status(400).send({ msg: "El username ya está en uso" });
+        }
+
+        // Update the user with the new username
+        const response = await User.findByIdAndUpdate(
+            user_id,
+            { username },
+            { new: true }
+        ).select(["-password"]);
+
+        if (!response) {
+            return res.status(400).send({ msg: "No se pudo asignar el username" });
+        }
+
+        return res.status(200).send({
+            msg: "Username asignado exitosamente",
+            user: response
+        });
+    } catch (error) {
+        console.error("Error en assignUsername:", error);
+        return res.status(500).send({ msg: "Error del servidor", error });
+    }
+}
 
 export const UserController = {
     getMe,
@@ -106,4 +142,5 @@ export const UserController = {
     getUser,
     updateUser,
     getUsersExeptParticipantsGroup,
+    assignUsername
 };

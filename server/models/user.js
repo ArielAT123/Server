@@ -9,6 +9,9 @@ const UserSchema = mongoose.Schema({
     lastname: String,
     password: String,
     avatar: String,
+    username: { type: String, required: true, unique: true },
+
 });
+
 
 export const User = mongoose.model("User", UserSchema);
