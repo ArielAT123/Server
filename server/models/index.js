@@ -12,3 +12,4 @@ export * from "./Post.js";
 export * from "./Product.js";
 export * from "./Report.js";
 export * from "./event.js";
+export * from "./story.js";

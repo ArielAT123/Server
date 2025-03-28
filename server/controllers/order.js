@@ -4,7 +4,7 @@ import { Product } from "../models/Product.js";
 async function create(req, res) {
   try {
     const { product_id, quantity } = req.body;
-    const { user_id } = req.user;
+    const { userBuyer_id } = req.user;
 
     const product = await Product.findById(product_id);
     if (!product) return res.status(404).send({ msg: "Producto no encontrado" });
@@ -12,7 +12,7 @@ async function create(req, res) {
     const total = product.price * quantity;
 
     const order = new Order({
-      buyer: user_id,
+      buyer: userBuyer_id,
       seller: product.owner,
       product: product_id,
       quantity,

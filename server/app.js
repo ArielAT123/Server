@@ -22,7 +22,11 @@ import {
   productRoutes,
   reportRoutes,
   eventRoutes,
+  feedRoutes,
+  StoryRoutes
 } from "./routes/index.js";
+
+
 
 const app = express();
 const server = http.createServer(app);
@@ -44,8 +48,8 @@ app.use("/api", chatRoutes);
 app.use("/api", chatMessageRoutes);
 app.use("/api", groupRoutes);
 app.use("/api", groupMessageRoutes);
-
-
+app.use("/api", feedRoutes);
+app.use("/api", StoryRoutes);
 app.use("/api", postRoutes);
 app.use("/api", commentRoutes);
 app.use("/api", likeRoutes);

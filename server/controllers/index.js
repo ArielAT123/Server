@@ -14,3 +14,5 @@ export * from "./product.js";
 export * from "./tag.js";
 export * from "./report.js";
 export * from "./event.js";
+export * from "./feed.js";
+export * from "./story.js";
