@@ -8,7 +8,8 @@ const PostSchema = new mongoose.Schema(
     video: { type: String }, // Opcional
     hashtags: [{ type: String }],
     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }]
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+    public: { type: Boolean, default: true },
   },
   {
     timestamps: true,

@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post("/post", [mdAuth.asureAuth], PostController.create);
 router.get("/post", PostController.getAll);
+router.get("/post/:id", PostController.getById);
 router.get("/post/user/:user_id", [mdAuth.asureAuth] ,PostController.getByUser);
 router.delete("/post/:id", [mdAuth.asureAuth], PostController.delete);
 router.put("/post/:id", [mdAuth.asureAuth], PostController.update);

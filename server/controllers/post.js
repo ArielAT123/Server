@@ -54,6 +54,16 @@ export const PostController = {
     }
   },
 
+  getById: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const post = await Post.findById(id).populate("user", "-password");
+      res.status(200).send(post);
+    } catch (error) {
+      res.status(500).send({ msg: "Error al obtener publicación", error });
+    }
+  },
+
   getByUser: async (req, res) => {
     const { user_id } = req.params;
     try {
